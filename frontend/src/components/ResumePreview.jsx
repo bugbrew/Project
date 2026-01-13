@@ -1,50 +1,100 @@
-import React from "react";
+export default function ResumePreview({ data }) {
+  if (!data) return <p>No resume data to preview.</p>;
 
-const ResumePreview = ({ resumeData }) => {
-  if (!resumeData) return <p className="no-resume">Your resume preview will appear here!</p>;
+  const {
+    name,
+    email,
+    phone,
+    github,
+    linkedin,
+    portfolio,
+    summary,
+    skills,
+    experience,
+    education,
+    photo,
+  } = data;
 
   return (
-    <div className="resume-card">
-      <header>
-        <div className="header-left">
-          <h1>{resumeData.name}</h1>
-          <p>{resumeData.email} | {resumeData.phone}</p>
-          {resumeData.github && <p>GitHub: {resumeData.github}</p>}
-          {resumeData.linkedin && <p>LinkedIn: {resumeData.linkedin}</p>}
-          {resumeData.portfolio && <p>Portfolio: {resumeData.portfolio}</p>}
+    <div className="resume-preview">
+      {/* HEADER */}
+      <header className="resume-header">
+        {photo && (
+          <img
+            src={URL.createObjectURL(photo)}
+            alt="Profile"
+            className="resume-photo"
+          />
+        )}
+
+        <div>
+          <h1 className="resume-name">{name}</h1>
+
+          <p className="resume-contact">
+            {email} | {phone}
+          </p>
+
+          <p className="resume-links">
+            {github && <span>GitHub: {github}</span>}
+            {linkedin && <span> | LinkedIn: {linkedin}</span>}
+            {portfolio && <span> | Portfolio: {portfolio}</span>}
+          </p>
         </div>
-        {resumeData.photo && <div className="photo"><img src={resumeData.photo} alt="Profile" /></div>}
       </header>
 
-      {resumeData.summary && (
-        <section>
-          <h2>Summary</h2>
-          <p>{resumeData.summary}</p>
+      {/* SUMMARY */}
+      {summary && (
+        <section className="resume-section">
+          <h2>Professional Summary</h2>
+          <p>{summary}</p>
         </section>
       )}
 
-      <section>
-        <h2>Skills</h2>
-        <p>{resumeData.skills}</p>
-      </section>
+      {/* EXPERIENCE */}
+      {experience?.length > 0 && (
+        <section className="resume-section">
+          <h2>Experience</h2>
+          {experience.map((exp, idx) => (
+            <div key={idx} className="resume-block">
+              <div className="block-header">
+                <strong>{exp.role}</strong>
+                <span>{exp.startDate} – {exp.endDate || "Present"}</span>
+              </div>
+              <p className="company-name">{exp.company}</p>
+              <p className="block-description">{exp.description}</p>
+            </div>
+          ))}
+        </section>
+      )}
 
-      <section>
-        <h2>Experience</h2>
-        {resumeData.experiences.map((exp, i) => (
-          <div key={i} className="experience-block">
-            <h3>{exp.title} - {exp.company}</h3>
-            <p>{exp.duration}</p>
-            <p>{exp.description}</p>
-          </div>
-        ))}
-      </section>
+      {/* EDUCATION */}
+      {education?.length > 0 && (
+        <section className="resume-section">
+          <h2>Education</h2>
+          {education.map((edu, idx) => (
+            <div key={idx} className="resume-block">
+              <div className="block-header">
+                <strong>{edu.degree}</strong>
+                <span>{edu.graduationYear}</span>
+              </div>
+              <p className="institute-name">{edu.institute}</p>
+              {edu.subjects && <p className="block-description">Subjects: {edu.subjects}</p>}
+            </div>
+          ))}
+        </section>
+      )}
 
-      <section>
-        <h2>Education</h2>
-        <p>{resumeData.educationInstitute} | {resumeData.educationYear} | {resumeData.educationSubjects}</p>
-      </section>
+      {/* SKILLS */}
+      {skills?.length > 0 && (
+        <section className="resume-section">
+          <h2>Skills</h2>
+          <ul className="skills-list">
+            {skills.map((skill, idx) => (
+              <li key={idx}>{skill}</li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
-};
-
-export default ResumePreview;
+}

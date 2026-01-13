@@ -1,8 +1,39 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 
-const ResumeForm = ({ setResumeData }) => {
-  const [form, setForm] = useState({
+const emptyExperience = {
+  company: "",
+  role: "",
+  startDate: "",
+  endDate: "",
+  description: "",
+};
+
+const emptyEducation = {
+  institute: "",
+  degree: "",
+  graduationYear: "",
+  subjects: "",
+};
+
+const SKILL_OPTIONS = [
+  "C",
+  "C++",
+  "Python",
+  "Java",
+  "JavaScript",
+  "HTML",
+  "CSS",
+  "React",
+  "Node.js",
+  "Express",
+  "SQL",
+  "Git",
+  "Linux",
+  "Ruby",
+];
+
+export default function ResumeForm({ onPreview }) {
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
@@ -10,150 +41,293 @@ const ResumeForm = ({ setResumeData }) => {
     linkedin: "",
     portfolio: "",
     summary: "",
-    photo: "",
-    skills: "",
-    experiences: [{ title: "", company: "", duration: "", description: "" }],
-    educationInstitute: "",
-    educationYear: "",
-    educationSubjects: ""
+    skills: [],
+    experience: [{ ...emptyExperience }],
+    education: [{ ...emptyEducation }],
+    photo: null,
   });
 
-  const [errors, setErrors] = useState({});
-
+  // ---------- BASIC INPUT HANDLER ----------
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleExperienceChange = (index, e) => {
-    const newExperiences = [...form.experiences];
-    newExperiences[index][e.target.name] = e.target.value;
-    setForm({ ...form, experiences: newExperiences });
+  // ---------- EXPERIENCE ----------
+  const handleExperienceChange = (index, field, value) => {
+    const updated = [...formData.experience];
+    updated[index][field] = value;
+    setFormData((prev) => ({ ...prev, experience: updated }));
   };
 
   const addExperience = () => {
-    setForm({ ...form, experiences: [...form.experiences, { title: "", company: "", duration: "", description: "" }] });
+    setFormData((prev) => ({
+      ...prev,
+      experience: [...prev.experience, { ...emptyExperience }],
+    }));
   };
 
+  const removeExperience = (index) => {
+    const updated = formData.experience.filter((_, i) => i !== index);
+    setFormData((prev) => ({ ...prev, experience: updated }));
+  };
+
+  // ---------- EDUCATION ----------
+  const handleEducationChange = (index, field, value) => {
+    const updated = [...formData.education];
+    updated[index][field] = value;
+    setFormData((prev) => ({ ...prev, education: updated }));
+  };
+
+  // ---------- PHOTO ----------
   const handlePhotoUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => setForm({ ...form, photo: reader.result });
-      reader.readAsDataURL(file);
-    }
+    setFormData((prev) => ({
+      ...prev,
+      photo: e.target.files[0],
+    }));
   };
 
-  const validate = () => {
-    const errs = {};
-    if (!/^[a-zA-Z\s]{2,50}$/.test(form.name)) errs.name = "Name should be 2-50 letters";
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) errs.email = "Enter a valid email";
-    if (!/^\d{10}$/.test(form.phone)) errs.phone = "Phone must be 10 digits";
-    if (form.github && !/^https?:\/\/github\.com\/\S+$/.test(form.github)) errs.github = "Invalid GitHub URL";
-    if (form.linkedin && !/^https?:\/\/(www\.)?linkedin\.com\/.*$/.test(form.linkedin)) errs.linkedin = "Invalid LinkedIn URL";
-    if (form.portfolio && !/^https?:\/\/\S+$/.test(form.portfolio)) errs.portfolio = "Invalid Portfolio URL";
-    return errs;
+  // ---------- SKILLS ----------
+  const toggleSkill = (skill) => {
+    setFormData((prev) => ({
+      ...prev,
+      skills: prev.skills.includes(skill)
+        ? prev.skills.filter((s) => s !== skill)
+        : [...prev.skills, skill],
+    }));
   };
 
+  // ---------- SUBMIT ----------
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errs = validate();
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
+
     try {
-      const res = await axios.post("http://localhost:5000/api/resume", form);
-      alert(res.data.message);
-      setResumeData(form);
-    } catch (err) {
-      console.error(err);
+      await fetch("http://localhost:5000/api/resume", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      localStorage.setItem("resumeData", JSON.stringify(formData));
+      onPreview(formData);
+    } catch (error) {
+      console.error("Resume submit failed:", error);
       alert("Error submitting resume");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="resume-form">
-      <h2>Build Your Professional Resume</h2>
+    <form className="resume-form" onSubmit={handleSubmit}>
+      <h2>Resume Builder</h2>
 
-      <div className="form-group">
-        <label>Name</label>
-        <input type="text" name="name" value={form.name} onChange={handleChange} maxLength={50} required />
-        {errors.name && <span className="error">{errors.name}</span>}
-      </div>
+      {/* PERSONAL INFO */}
+      <section>
+        <input
+          name="name"
+          placeholder="Full Name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+        />
 
-      <div className="form-group">
-        <label>Email</label>
-        <input type="email" name="email" value={form.email} onChange={handleChange} required />
-        {errors.email && <span className="error">{errors.email}</span>}
-      </div>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
 
-      <div className="form-group">
-        <label>Phone</label>
-        <input type="tel" name="phone" value={form.phone} onChange={handleChange} required />
-        {errors.phone && <span className="error">{errors.phone}</span>}
-      </div>
+        <input
+          type="tel"
+          name="phone"
+          placeholder="Phone (10 digits)"
+          pattern="[0-9]{10}"
+          value={formData.phone}
+          onChange={handleChange}
+          required
+        />
+      </section>
 
-      <div className="form-group">
-        <label>Photo (optional)</label>
-        <input type="file" accept="image/*" onChange={handlePhotoUpload} />
-      </div>
+      {/* LINKS */}
+      <section>
+        <input
+          name="github"
+          placeholder="GitHub URL"
+          value={formData.github}
+          onChange={handleChange}
+        />
 
-      <div className="form-group">
-        <label>Summary</label>
-        <textarea name="summary" value={form.summary} onChange={handleChange} maxLength={300} />
-      </div>
+        <input
+          name="linkedin"
+          placeholder="LinkedIn URL"
+          value={formData.linkedin}
+          onChange={handleChange}
+        />
 
-      <div className="form-group">
-        <label>GitHub URL (optional)</label>
-        <input type="url" name="github" value={form.github} onChange={handleChange} placeholder="https://github.com/username" />
-      </div>
+        <input
+          name="portfolio"
+          placeholder="Portfolio Website"
+          value={formData.portfolio}
+          onChange={handleChange}
+        />
+      </section>
 
-      <div className="form-group">
-        <label>LinkedIn URL (optional)</label>
-        <input type="url" name="linkedin" value={form.linkedin} onChange={handleChange} placeholder="https://linkedin.com/in/username" />
-      </div>
+      {/* SUMMARY */}
+      <section>
+        <textarea
+          name="summary"
+          placeholder="Professional Summary"
+          rows="4"
+          value={formData.summary}
+          onChange={handleChange}
+        />
+      </section>
 
-      <div className="form-group">
-        <label>Portfolio URL (optional)</label>
-        <input type="url" name="portfolio" value={form.portfolio} onChange={handleChange} placeholder="https://portfolio.com" />
-      </div>
+      {/* SKILLS */}
+      <section>
+        <h3>Technical Skills</h3>
 
-      <div className="form-group">
-        <label>Skills</label>
-        <textarea name="skills" value={form.skills} onChange={handleChange} maxLength={200} required />
-      </div>
+        <div className="skills-grid">
+          {SKILL_OPTIONS.map((skill) => (
+            <label key={skill} className="skill-item">
+              <input
+                type="checkbox"
+                checked={formData.skills.includes(skill)}
+                onChange={() => toggleSkill(skill)}
+              />
+              {skill}
+            </label>
+          ))}
+        </div>
+      </section>
 
-      {/* Experience Section */}
-      <div className="form-group">
-        <label>Experience</label>
-        {form.experiences.map((exp, index) => (
-          <div key={index} className="experience-block">
-            <input name="title" value={exp.title} onChange={(e) => handleExperienceChange(index, e)} placeholder="Job Title" required />
-            <input name="company" value={exp.company} onChange={(e) => handleExperienceChange(index, e)} placeholder="Company Name" required />
-            <input name="duration" value={exp.duration} onChange={(e) => handleExperienceChange(index, e)} placeholder="Duration" required />
-            <textarea name="description" value={exp.description} onChange={(e) => handleExperienceChange(index, e)} placeholder="Description" required />
+      {/* EXPERIENCE */}
+      <section>
+        <h3>Experience</h3>
+
+        {formData.experience.map((exp, index) => (
+          <div className="block" key={index}>
+            <input
+              placeholder="Company Name"
+              value={exp.company}
+              onChange={(e) =>
+                handleExperienceChange(index, "company", e.target.value)
+              }
+            />
+
+            <input
+              placeholder="Role"
+              value={exp.role}
+              onChange={(e) =>
+                handleExperienceChange(index, "role", e.target.value)
+              }
+            />
+
+            <input
+              placeholder="Start Date"
+              value={exp.startDate}
+              onChange={(e) =>
+                handleExperienceChange(index, "startDate", e.target.value)
+              }
+            />
+
+            <input
+              placeholder="End Date"
+              value={exp.endDate}
+              onChange={(e) =>
+                handleExperienceChange(index, "endDate", e.target.value)
+              }
+            />
+
+            <textarea
+              placeholder="Description"
+              rows="3"
+              value={exp.description}
+              onChange={(e) =>
+                handleExperienceChange(index, "description", e.target.value)
+              }
+            />
+
+            {formData.experience.length > 1 && (
+              <button
+                type="button"
+                className="danger-btn"
+                onClick={() => removeExperience(index)}
+              >
+                Remove Experience
+              </button>
+            )}
           </div>
         ))}
-        <button type="button" className="add-exp-btn" onClick={addExperience}>Add More Experience</button>
-      </div>
 
-      {/* Education */}
-      <div className="form-group">
-        <label>Institute Name</label>
-        <input type="text" name="educationInstitute" value={form.educationInstitute} onChange={handleChange} required />
-      </div>
+        <button type="button" onClick={addExperience}>
+          Add Experience
+        </button>
+      </section>
 
-      <div className="form-group">
-        <label>Graduation Year</label>
-        <input type="text" name="educationYear" value={form.educationYear} onChange={handleChange} required />
-      </div>
+      {/* EDUCATION */}
+      <section>
+        <h3>Education</h3>
 
-      <div className="form-group">
-        <label>Subjects / Major</label>
-        <input type="text" name="educationSubjects" value={form.educationSubjects} onChange={handleChange} required />
-      </div>
+        {formData.education.map((edu, index) => (
+          <div className="block" key={index}>
+            <input
+              placeholder="Institute Name"
+              value={edu.institute}
+              onChange={(e) =>
+                handleEducationChange(index, "institute", e.target.value)
+              }
+            />
 
-      <button type="submit">Preview Resume</button>
+            <input
+              placeholder="Degree"
+              value={edu.degree}
+              onChange={(e) =>
+                handleEducationChange(index, "degree", e.target.value)
+              }
+            />
+
+            <input
+              placeholder="Graduation Year"
+              value={edu.graduationYear}
+              onChange={(e) =>
+                handleEducationChange(index, "graduationYear", e.target.value)
+              }
+            />
+
+            <input
+              placeholder="Subjects / Specialization"
+              value={edu.subjects}
+              onChange={(e) =>
+                handleEducationChange(index, "subjects", e.target.value)
+              }
+            />
+          </div>
+        ))}
+      </section>
+
+      {/* PHOTO */}
+      <section>
+        <label>Optional Photo</label>
+        <input type="file" accept="image/*" onChange={handlePhotoUpload} />
+      </section>
+
+      {/* ACTIONS */}
+      <div className="form-actions">
+        <button
+          type="button"
+          className="secondary-btn"
+          onClick={() => onPreview(formData)}
+        >
+          Preview Resume
+        </button>
+
+        <button type="submit" className="submit-btn">
+          Save Resume
+        </button>
+      </div>
     </form>
   );
-};
-
-export default ResumeForm;
+}
