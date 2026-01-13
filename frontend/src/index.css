@@ -1,0 +1,198 @@
+/* ===== Body and Global Styles ===== */
+body {
+  font-family: "Arial", sans-serif;
+  background: #f4f4f9;
+  margin: 0;
+  padding: 40px;
+  color: #222;
+}
+
+h1, h2, h3 {
+  margin: 0;
+}
+
+/* ===== App Container ===== */
+.app-container {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ===== Resume Form ===== */
+.resume-form {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 360px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.resume-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #222;
+  font-size: 1.4em;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 0.95em;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-size: 0.95em;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.error {
+  color: red;
+  font-size: 0.8em;
+  margin-top: 3px;
+  display: block;
+}
+
+/* ===== Buttons ===== */
+.resume-form button,
+.add-exp-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.resume-form button:hover,
+.add-exp-btn:hover {
+  background-color: #0056b3;
+}
+
+/* ===== Experience Block in Form ===== */
+.experience-block {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.experience-block input,
+.experience-block textarea {
+  margin-bottom: 8px;
+}
+
+/* ===== Resume Preview ===== */
+.resume-card {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 600px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.resume-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.resume-card header h1 {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.resume-card .header-left p {
+  font-size: 0.9em;
+  margin: 3px 0;
+  color: #555;
+}
+
+.resume-card .photo img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #007bff;
+}
+
+/* ===== Sections ===== */
+.resume-card section {
+  margin-bottom: 20px;
+}
+
+.resume-card h2 {
+  margin-bottom: 8px;
+  color: #007bff;
+  font-size: 1.1em;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 3px;
+}
+
+.resume-card p {
+  margin: 3px 0;
+  font-size: 0.95em;
+  color: #333;
+}
+
+/* ===== Experience Blocks in Preview ===== */
+.resume-card .experience-block {
+  margin-bottom: 10px;
+}
+
+.resume-card .experience-block h3 {
+  font-size: 1em;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.resume-card .experience-block p {
+  font-size: 0.95em;
+  margin: 2px 0;
+}
+
+/* ===== No Resume Placeholder ===== */
+.no-resume {
+  text-align: center;
+  color: #555;
+  font-style: italic;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1000px) {
+  .app-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .resume-card {
+    width: 90%;
+  }
+
+  .resume-form {
+    width: 90%;
+  }
+}
