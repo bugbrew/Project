@@ -1,4 +1,7 @@
 import { useState } from "react";
+import ProjectsSection from "./ProjectsSection";
+import CertificationsSection from "./CertificationsSection";
+
 
 const emptyExperience = {
   company: "",
@@ -267,6 +270,22 @@ export default function ResumeForm({ onPreview }) {
         </button>
       </section>
 
+
+      <ProjectsSection
+        projects={formData.projects}
+        onChange={(projects) =>
+          setFormData({ ...formData, projects })
+        }
+      />
+      
+      <CertificationsSection
+        certifications={formData.certifications}
+        onChange={(certifications) =>
+          setFormData({ ...formData, certifications })
+        }
+      />
+      
+
       {/* EDUCATION */}
       <section>
         <h3>Education</h3>
@@ -331,3 +350,8 @@ export default function ResumeForm({ onPreview }) {
     </form>
   );
 }
+
+
+
+
+
