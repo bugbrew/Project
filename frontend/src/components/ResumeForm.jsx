@@ -1,357 +1,217 @@
-import { useState } from "react";
-import ProjectsSection from "./ProjectsSection";
-import CertificationsSection from "./CertificationsSection";
+import React from "react";
 
-
-const emptyExperience = {
-  company: "",
-  role: "",
-  startDate: "",
-  endDate: "",
-  description: "",
-};
-
-const emptyEducation = {
-  institute: "",
-  degree: "",
-  graduationYear: "",
-  subjects: "",
-};
-
-const SKILL_OPTIONS = [
-  "C",
-  "C++",
-  "Python",
-  "Java",
-  "JavaScript",
-  "HTML",
-  "CSS",
-  "React",
-  "Node.js",
-  "Express",
-  "SQL",
-  "Git",
-  "Linux",
-  "Ruby",
+const ALL_SKILLS = [
+  "C", "C++", "Python", "Java", "JavaScript",
+  "HTML", "CSS", "React", "Node.js", "Express",
+  "SQL", "MongoDB", "Git", "Linux", "Ruby", "TypeScript"
 ];
 
-export default function ResumeForm({ onPreview }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    github: "",
-    linkedin: "",
-    portfolio: "",
-    summary: "",
-    skills: [],
-    experience: [{ ...emptyExperience }],
-    education: [{ ...emptyEducation }],
-    photo: null,
-  });
+export default function ResumeForm({ resumeData, setResumeData }) {
 
-  // ---------- BASIC INPUT HANDLER ----------
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setResumeData(prev => ({ ...prev, [name]: value }));
   };
 
-  // ---------- EXPERIENCE ----------
+  const toggleSkill = (skill) => {
+    setResumeData(prev => {
+      const skills = prev.skills || [];
+      const updatedSkills = skills.includes(skill)
+        ? skills.filter(s => s !== skill)
+        : [...skills, skill];
+      return { ...prev, skills: updatedSkills };
+    });
+  };
+
+  // Experience handlers
   const handleExperienceChange = (index, field, value) => {
-    const updated = [...formData.experience];
+    const updated = [...resumeData.experience];
     updated[index][field] = value;
-    setFormData((prev) => ({ ...prev, experience: updated }));
+    setResumeData(prev => ({ ...prev, experience: updated }));
   };
 
   const addExperience = () => {
-    setFormData((prev) => ({
+    setResumeData(prev => ({
       ...prev,
-      experience: [...prev.experience, { ...emptyExperience }],
+      experience: [...prev.experience, { company: "", role: "", startDate: "", endDate: "", description: "" }]
     }));
   };
 
   const removeExperience = (index) => {
-    const updated = formData.experience.filter((_, i) => i !== index);
-    setFormData((prev) => ({ ...prev, experience: updated }));
+    const updated = resumeData.experience.filter((_, i) => i !== index);
+    setResumeData(prev => ({ ...prev, experience: updated }));
   };
 
-  // ---------- EDUCATION ----------
+  // Education handlers
   const handleEducationChange = (index, field, value) => {
-    const updated = [...formData.education];
+    const updated = [...resumeData.education];
     updated[index][field] = value;
-    setFormData((prev) => ({ ...prev, education: updated }));
+    setResumeData(prev => ({ ...prev, education: updated }));
   };
 
-  // ---------- PHOTO ----------
-  const handlePhotoUpload = (e) => {
-    setFormData((prev) => ({
+  const addEducation = () => {
+    setResumeData(prev => ({
       ...prev,
-      photo: e.target.files[0],
+      education: [...prev.education, { institute: "", degree: "", graduationYear: "", subjects: "" }]
     }));
   };
 
-  // ---------- SKILLS ----------
-  const toggleSkill = (skill) => {
-    setFormData((prev) => ({
+  const removeEducation = (index) => {
+    const updated = resumeData.education.filter((_, i) => i !== index);
+    setResumeData(prev => ({ ...prev, education: updated }));
+  };
+
+  // Project handlers
+  const handleProjectChange = (index, field, value) => {
+    const updated = [...resumeData.projects];
+    updated[index][field] = value;
+    setResumeData(prev => ({ ...prev, projects: updated }));
+  };
+
+  const addProject = () => {
+    setResumeData(prev => ({
       ...prev,
-      skills: prev.skills.includes(skill)
-        ? prev.skills.filter((s) => s !== skill)
-        : [...prev.skills, skill],
+      projects: [...prev.projects, { title: "", description: "", techStack: "", links: "" }]
     }));
   };
 
-  // ---------- SUBMIT ----------
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      await fetch("http://localhost:5000/api/resume", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      localStorage.setItem("resumeData", JSON.stringify(formData));
-      onPreview(formData);
-    } catch (error) {
-      console.error("Resume submit failed:", error);
-      alert("Error submitting resume");
-    }
+  const removeProject = (index) => {
+    const updated = resumeData.projects.filter((_, i) => i !== index);
+    setResumeData(prev => ({ ...prev, projects: updated }));
   };
 
   return (
-    <form className="resume-form" onSubmit={handleSubmit}>
-      <h2>Resume Builder</h2>
+    <div className="resume-form">
+      <h1>Resume Builder</h1>
 
-      {/* PERSONAL INFO */}
-      <section>
-        <input
-          name="name"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
+      {/* Personal Details / Links */}
+      <section className="form-grid two-section">
+        <div className="form-box">
+          <h2>Personal Details</h2>
+          <input name="name" placeholder="Full Name" value={resumeData.name} onChange={handleChange} />
+          <input name="email" placeholder="Email" value={resumeData.email} onChange={handleChange} />
+          <input name="phone" placeholder="Phone" value={resumeData.phone} onChange={handleChange} />
+        </div>
+        <div className="form-box">
+          <h2>Links</h2>
+          <input name="github" placeholder="GitHub URL" value={resumeData.github} onChange={handleChange} />
+          <input name="linkedin" placeholder="LinkedIn URL" value={resumeData.linkedin} onChange={handleChange} />
+          <input name="portfolio" placeholder="Portfolio Website" value={resumeData.portfolio} onChange={handleChange} />
+        </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
+        <div className="links-preview">
+        {resumeData.github && (
+          <p>
+            GitHub:{" "}
+            <a
+              href={resumeData.github.startsWith("http") ? resumeData.github : `https://${resumeData.github}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {resumeData.github}
+            </a>
+          </p>
+        )}
 
-        <input
-          type="tel"
-          name="phone"
-          placeholder="Phone (10 digits)"
-          pattern="[0-9]{10}"
-          value={formData.phone}
-          onChange={handleChange}
-          required
-        />
+        {resumeData.linkedin && (
+          <p>
+            LinkedIn:{" "}
+            <a
+              href={resumeData.linkedin.startsWith("http") ? resumeData.linkedin : `https://${resumeData.linkedin}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {resumeData.linkedin}
+            </a>
+          </p>
+        )}
+
+        {resumeData.portfolio && (
+          <p>
+            Portfolio:{" "}
+            <a
+              href={resumeData.portfolio.startsWith("http") ? resumeData.portfolio : `https://${resumeData.portfolio}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {resumeData.portfolio}
+            </a>
+          </p>
+        )}
+      </div>
+
       </section>
 
-      {/* LINKS */}
-      <section>
-        <input
-          name="github"
-          placeholder="GitHub URL"
-          value={formData.github}
-          onChange={handleChange}
-        />
+      {/* Skills / Experience */}
+      <section className="form-grid two-section">
+        <div className="form-box">
+          <h2>Skills</h2>
+          <div className="skills-list">
+            {ALL_SKILLS.map(skill => (
+              <label key={skill} className="skill-item">
+                <input
+                  type="checkbox"
+                  checked={resumeData.skills.includes(skill)}
+                  onChange={() => toggleSkill(skill)}
+                />
+                {skill}
+              </label>
+            ))}
+          </div>
+        </div>
 
-        <input
-          name="linkedin"
-          placeholder="LinkedIn URL"
-          value={formData.linkedin}
-          onChange={handleChange}
-        />
-
-        <input
-          name="portfolio"
-          placeholder="Portfolio Website"
-          value={formData.portfolio}
-          onChange={handleChange}
-        />
-      </section>
-
-      {/* SUMMARY */}
-      <section>
-        <textarea
-          name="summary"
-          placeholder="Professional Summary"
-          rows="4"
-          value={formData.summary}
-          onChange={handleChange}
-        />
-      </section>
-
-      {/* SKILLS */}
-      <section>
-        <h3>Technical Skills</h3>
-
-        <div className="skills-grid">
-          {SKILL_OPTIONS.map((skill) => (
-            <label key={skill} className="skill-item">
-              <input
-                type="checkbox"
-                checked={formData.skills.includes(skill)}
-                onChange={() => toggleSkill(skill)}
-              />
-              {skill}
-            </label>
+        <div className="form-box">
+          <h2>Experience</h2>
+          {resumeData.experience.map((exp, i) => (
+            <div key={i} className="block">
+              <input placeholder="Company" value={exp.company} onChange={(e) => handleExperienceChange(i, "company", e.target.value)} />
+              <input placeholder="Role" value={exp.role} onChange={(e) => handleExperienceChange(i, "role", e.target.value)} />
+              <input placeholder="Start Date" value={exp.startDate} onChange={(e) => handleExperienceChange(i, "startDate", e.target.value)} />
+              <input placeholder="End Date" value={exp.endDate} onChange={(e) => handleExperienceChange(i, "endDate", e.target.value)} />
+              <textarea placeholder="Description" rows={3} value={exp.description} onChange={(e) => handleExperienceChange(i, "description", e.target.value)} />
+              {resumeData.experience.length > 1 && <button type="button" onClick={() => removeExperience(i)}>Remove</button>}
+            </div>
           ))}
+          <button type="button" onClick={addExperience}>Add Experience</button>
         </div>
       </section>
 
-      {/* EXPERIENCE */}
-      <section>
-        <h3>Experience</h3>
+      {/* Projects / Education */}
+      <section className="form-grid two-section">
+        <div className="form-box">
+          <h2>Projects</h2>
+          {resumeData.projects.map((proj, i) => (
+            <div key={i} className="block">
+              <input placeholder="Title" value={proj.title} onChange={(e) => handleProjectChange(i, "title", e.target.value)} />
+              <input placeholder="Tech Stack" value={proj.techStack} onChange={(e) => handleProjectChange(i, "techStack", e.target.value)} />
+              <input placeholder="Links" value={proj.links} onChange={(e) => handleProjectChange(i, "links", e.target.value)} />
+              <textarea placeholder="Description" rows={3} value={proj.description} onChange={(e) => handleProjectChange(i, "description", e.target.value)} />
+              {resumeData.projects.length > 1 && <button type="button" onClick={() => removeProject(i)}>Remove</button>}
+            </div>
+          ))}
+          <button type="button" onClick={addProject}>Add Project</button>
+        </div>
 
-        {formData.experience.map((exp, index) => (
-          <div className="block" key={index}>
-            <input
-              placeholder="Company Name"
-              value={exp.company}
-              onChange={(e) =>
-                handleExperienceChange(index, "company", e.target.value)
-              }
-            />
-
-            <input
-              placeholder="Role"
-              value={exp.role}
-              onChange={(e) =>
-                handleExperienceChange(index, "role", e.target.value)
-              }
-            />
-
-            <input
-              placeholder="Start Date"
-              value={exp.startDate}
-              onChange={(e) =>
-                handleExperienceChange(index, "startDate", e.target.value)
-              }
-            />
-
-            <input
-              placeholder="End Date"
-              value={exp.endDate}
-              onChange={(e) =>
-                handleExperienceChange(index, "endDate", e.target.value)
-              }
-            />
-
-            <textarea
-              placeholder="Description"
-              rows="3"
-              value={exp.description}
-              onChange={(e) =>
-                handleExperienceChange(index, "description", e.target.value)
-              }
-            />
-
-            {formData.experience.length > 1 && (
-              <button
-                type="button"
-                className="danger-btn"
-                onClick={() => removeExperience(index)}
-              >
-                Remove Experience
-              </button>
-            )}
-          </div>
-        ))}
-
-        <button type="button" onClick={addExperience}>
-          Add Experience
-        </button>
+        <div className="form-box">
+          <h2>Education</h2>
+          {resumeData.education.map((edu, i) => (
+            <div key={i} className="block">
+              <input placeholder="Institute" value={edu.institute} onChange={(e) => handleEducationChange(i, "institute", e.target.value)} />
+              <input placeholder="Degree" value={edu.degree} onChange={(e) => handleEducationChange(i, "degree", e.target.value)} />
+              <input placeholder="Year" value={edu.graduationYear} onChange={(e) => handleEducationChange(i, "graduationYear", e.target.value)} />
+              <input placeholder="Subjects" value={edu.subjects} onChange={(e) => handleEducationChange(i, "subjects", e.target.value)} />
+              {resumeData.education.length > 1 && <button type="button" onClick={() => removeEducation(i)}>Remove</button>}
+            </div>
+          ))}
+          <button type="button" onClick={addEducation}>Add Education</button>
+        </div>
       </section>
 
-
-      <ProjectsSection
-        projects={formData.projects}
-        onChange={(projects) =>
-          setFormData({ ...formData, projects })
-        }
-      />
-      
-      <CertificationsSection
-        certifications={formData.certifications}
-        onChange={(certifications) =>
-          setFormData({ ...formData, certifications })
-        }
-      />
-      
-
-      {/* EDUCATION */}
+      {/* Professional Summary */}
       <section>
-        <h3>Education</h3>
-
-        {formData.education.map((edu, index) => (
-          <div className="block" key={index}>
-            <input
-              placeholder="Institute Name"
-              value={edu.institute}
-              onChange={(e) =>
-                handleEducationChange(index, "institute", e.target.value)
-              }
-            />
-
-            <input
-              placeholder="Degree"
-              value={edu.degree}
-              onChange={(e) =>
-                handleEducationChange(index, "degree", e.target.value)
-              }
-            />
-
-            <input
-              placeholder="Graduation Year"
-              value={edu.graduationYear}
-              onChange={(e) =>
-                handleEducationChange(index, "graduationYear", e.target.value)
-              }
-            />
-
-            <input
-              placeholder="Subjects / Specialization"
-              value={edu.subjects}
-              onChange={(e) =>
-                handleEducationChange(index, "subjects", e.target.value)
-              }
-            />
-          </div>
-        ))}
+        <h2>Professional Summary</h2>
+        <textarea name="summary" placeholder="Highlight your strengths" value={resumeData.summary} onChange={handleChange} rows={4} />
       </section>
-
-      {/* PHOTO */}
-      <section>
-        <label>Optional Photo</label>
-        <input type="file" accept="image/*" onChange={handlePhotoUpload} />
-      </section>
-
-      {/* ACTIONS */}
-      <div className="form-actions">
-        <button
-          type="button"
-          className="secondary-btn"
-          onClick={() => onPreview(formData)}
-        >
-          Preview Resume
-        </button>
-
-        <button type="submit" className="submit-btn">
-          Save Resume
-        </button>
-      </div>
-    </form>
+    </div>
   );
 }
-
-
-
-
-
