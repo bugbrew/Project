@@ -142,6 +142,63 @@ export default function ResumeForm({ resumeData, setResumeData }) {
 
       </section>
 
+      <div className="summary-section">
+  {/* Links above summary */}
+  <div className="links-inline">
+    {resumeData.github && (
+      <span>
+        GitHub:{" "}
+        <a
+          href={resumeData.github.startsWith("http") ? resumeData.github : `https://${resumeData.github}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {resumeData.github}
+        </a>
+      </span>
+    )}
+    {resumeData.linkedin && (
+      <span>
+        LinkedIn:{" "}
+        <a
+          href={resumeData.linkedin.startsWith("http") ? resumeData.linkedin : `https://${resumeData.linkedin}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {resumeData.linkedin}
+        </a>
+      </span>
+    )}
+    {resumeData.portfolio && (
+      <span>
+        Portfolio:{" "}
+        <a
+          href={resumeData.portfolio.startsWith("http") ? resumeData.portfolio : `https://${resumeData.portfolio}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {resumeData.portfolio}
+        </a>
+      </span>
+    )}
+  </div>
+
+  {/* Summary */}
+  <h3>Summary</h3>
+  <p>{resumeData.summary || "No summary added yet."}</p>
+</div>
+
+
+
+
+      <textarea
+        name="summary"
+        placeholder="Write a brief professional summary..."
+        value={resumeData.summary}
+        onChange={handleChange}
+      />
+
+
       {/* Skills / Experience */}
       <section className="form-grid two-section">
         <div className="form-box">

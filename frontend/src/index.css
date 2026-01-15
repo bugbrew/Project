@@ -125,3 +125,30 @@ input, textarea {
 .links-preview a:hover {
   text-decoration: underline;
 }
+
+
+.top-info {
+  display: flex;
+  flex-wrap: wrap;       /* stack on smaller screens */
+  gap: 40px;             /* space between columns */
+  margin-bottom: 20px;
+}
+
+.links-column,
+.summary-column {
+  flex: 1;               /* equal width columns */
+  min-width: 250px;      /* ensure they don’t get too small */
+}
+
+.links-column h3,
+.summary-column h3 {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.summary-column p {
+  line-height: 1.5;
+  font-size: 14px;
+  color: #333;
+}
