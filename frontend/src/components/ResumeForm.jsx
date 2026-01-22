@@ -188,9 +188,6 @@ export default function ResumeForm({ resumeData, setResumeData }) {
   <p>{resumeData.summary || "No summary added yet."}</p>
 </div>
 
-
-
-
       <textarea
         name="summary"
         placeholder="Write a brief professional summary..."
@@ -219,6 +216,7 @@ export default function ResumeForm({ resumeData, setResumeData }) {
 
         <div className="form-box">
           <h2>Experience</h2>
+
           {resumeData.experience.map((exp, i) => (
             <div key={i} className="block">
               <input placeholder="Company" value={exp.company} onChange={(e) => handleExperienceChange(i, "company", e.target.value)} />
@@ -229,6 +227,7 @@ export default function ResumeForm({ resumeData, setResumeData }) {
               {resumeData.experience.length > 1 && <button type="button" onClick={() => removeExperience(i)}>Remove</button>}
             </div>
           ))}
+          
           <button type="button" onClick={addExperience}>Add Experience</button>
         </div>
       </section>
